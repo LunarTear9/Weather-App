@@ -1,6 +1,14 @@
 # Weather App
 
-A new Flutter project.
+Basic Weather App
+
+Real Time Precipitation
+
+Real Time Humidity
+
+Real Time Temperature
+
+Information is for Tokyo city and forecast prediction data is up to 3 days 
 
 ## Getting Started
 
