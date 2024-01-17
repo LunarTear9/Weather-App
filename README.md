@@ -1,11 +1,16 @@
-Basic Weather App for Android and Windows.
+# anothertest
 
-Real Time Precipitation
+A new Flutter project.
 
-Real Time Humidity
+## Getting Started
 
-Real Time Temperature
+This project is a starting point for a Flutter application.
 
-City:Tokyo
+A few resources to get you started if this is your first Flutter project:
 
-Information available up to 3 days
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
