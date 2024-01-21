@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
@@ -36,8 +38,8 @@ dynamic nightflag = Colors.white;
 int y = 0;
 String z = 'assets/sky1.png';
 int Okay = 200;
-dynamic colors = Color.fromRGBO(158, 144, 0, 0.675);
-dynamic colors2 = Color.fromRGBO(158, 145, 0, 1);
+dynamic colors = Color.fromRGBO(190, 32, 0, 0.675);
+dynamic colors2 = Color.fromRGBO(114, 17, 0, 1);
 int tempflag = 0;
 int dayflag = 0;
 int dayindex = 0;
@@ -68,20 +70,31 @@ double x = 3;
 int nx = 16;
 double slider = 0;
 String currentDay = "Monday";
-dynamic SecondTempMatrix = _MyHomePageState().TempMatrix;
-dynamic SecondPrecMatrix = _MyHomePageState().PrecMatrix;
-dynamic SecondHumMatrix = _MyHomePageState().HumiMatrix;
+dynamic SecondTempMatrix = MyHomePageState().TempMatrix;
+dynamic SecondPrecMatrix = MyHomePageState().PrecMatrix;
+dynamic SecondHumMatrix = MyHomePageState().HumiMatrix;
 final Uri _url = Uri.parse('https://github.com/LunarTear9');
+String city = "Tokyo";
+String changeTime0 = "Change Time";
+String selectTime0 = "Select a time";
+String okay0 = "Confirm";
+String cancel0 = "Cancel";
+String Precipitation = "Precipitation";
+String Humidity = "Humidity";
+String Temperature = "Temperature";
+String Show = "Show";
+String showStatus = "";
 
 void ClockIndex() async {
   ClockIndx = ClockIndx + 1;
-  _MyHomePageState obj = _MyHomePageState();
+  MyHomePageState obj = MyHomePageState();
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      showPerformanceOverlay: false,
       debugShowMaterialGrid: false,
       debugShowCheckedModeBanner: false,
       home: MyHomePage(),
@@ -97,19 +110,21 @@ class MatrixElement {
 
 class MyHomePage extends StatefulWidget {
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  MyHomePageState createState() => MyHomePageState();
 
   void PopUpHelper() {
-    _MyHomePageState()._showPopup2(_MyHomePageState().context);
+    MyHomePageState().showPopup2(MyHomePageState().context);
   }
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class MyHomePageState extends State<MyHomePage> {
   late List<String> hourlyTime;
   late List<double> hourlyTemperature;
   late List<int> precipitationperhour;
   late List<int> totalhumidity;
   bool loading = true;
+  late TextEditingController controller;
+  String text = "";
 
   void changeView() {
     setState(() {
@@ -121,8 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (x > 18 || x < 7) {
         z = 'assets/sky1.png';
-        colors = Color.fromRGBO(158, 144, 0, 0.675);
-        colors2 = Color.fromRGBO(158, 145, 0, 1);
+        colors = Color.fromRGBO(0, 116, 145, 0.675);
+        colors2 = Color.fromRGBO(0, 146, 179, 1);
         nightflag = Colors.white;
       } else {
         z = 'assets/sky2.png';
@@ -189,6 +204,15 @@ class _MyHomePageState extends State<MyHomePage> {
         AveragePrec = 'Average Precipitation';
         AverageTemp = 'Average Temperature';
         Stats = 'Stats';
+        city = "Tokyo";
+        changeTime0 = "Change Time";
+        selectTime0 = "Select a Time";
+        okay0 = "Confirm";
+        cancel0 = "Cancel";
+        Precipitation = "Precipitation";
+        Temperature = "Temperature";
+        Humidity = "Humidity";
+        Show = "Show";
       } else if (LanguageIndex == 0) {
         first = '月曜日';
         second = '火曜日';
@@ -199,6 +223,15 @@ class _MyHomePageState extends State<MyHomePage> {
         AveragePrec = '平均降水量';
         AverageTemp = '平均気温';
         Stats = '統計';
+        city = "東京";
+        changeTime0 = "時間を変更する";
+        selectTime0 = "時間を選択してください ";
+        okay0 = "確認する";
+        cancel0 = "キャンセル";
+        Precipitation = "降水量";
+        Temperature = "温度";
+        Humidity = "湿度";
+        Show = "表示";
       }
     });
   }
@@ -215,15 +248,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    controller = TextEditingController();
     fetchData();
   }
 
   Future<void> fetchData() async {
     loading = true;
     try {
-      returnPrec();
-      returnHum();
-      returnTemp();
       LanguageIndex = 1;
       ChangeLanguage();
       final response = await http.get(Uri.parse(
@@ -253,6 +284,7 @@ class _MyHomePageState extends State<MyHomePage> {
               changeView();
             }
           }
+
           void _saveMatrixData() async {
             final matrixBox = await Hive.openBox('matrixBox');
 
@@ -272,6 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
           hourlyTemperature.clear();
           precipitationperhour.clear();
           totalhumidity.clear();
+          controller.dispose();
         });
 
         // Print specific data from the lists
@@ -297,69 +330,33 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: Drawer(
-          backgroundColor: colors,
-          child: ListView(
-            children: [
-              const SizedBox(
-                height: 10,
-                width: 10,
-              ),
-              /* ListTile(
-                title: Text(" - $first", textScaleFactor: 2),
-                onTap: () {
-                  currentDay = first;
-                },
-                tileColor: colors,
-              ),
-              const SizedBox(
-                height: 2,
-                width: 20,
-              ),
-              const SizedBox(
-                height: 20,
-                width: 10,
-              ),
-              ListTile(
-                title: Text(" - $second", textScaleFactor: 2),
-                onTap: () {
-                  currentDay = second;
-                },
-                tileColor: colors,
-              ),
-              const SizedBox(
-                height: 20,
-                width: 10,
-              ),
-              ListTile(
-                title: Text(" - $third", textScaleFactor: 2),
-                onTap: () {
-                  currentDay = third;
-                },
-                tileColor: colors,
-              ),*/
-              const SizedBox(
-                height: 20,
-                width: 10,
-              ),
-              const SizedBox(
-                height: 20,
-                width: 10,
-              ),
-              const SizedBox(
-                height: 20,
-                width: 10,
-              ),
-            ],
-          ),
-        ).animate().slideX(
-            curve: Curves.bounceOut, duration: Duration(milliseconds: 500)),
         appBar: AppBar(
-          backgroundColor: colors,
+          leading: IconButton(
+            icon: Icon(
+              Icons.menu, // You can use a different icon if you want
+              color: Colors.white, // Customize the color of the icon
+            ),
+            onPressed: () {
+              Scaffold.of(context)
+                  .openDrawer(); // Open the Drawer when the button is pressed
+            },
+          ),
+          backgroundColor: colors2,
           title: LiveTimeWidget(),
           flexibleSpace: Icon(Icons.cloud),
           actions: [
+            Text(
+              "$showStatus",
+              style: TextStyle(fontSize: 26, color: nightflag),
+            ),
             IconButton(
+                color: nightflag,
+                onPressed: () {
+                  _showAlertDialog(context);
+                },
+                icon: Icon(Icons.login)),
+            IconButton(
+              color: nightflag,
               icon: Icon(Icons.settings),
               style: ButtonStyle(
                   minimumSize: MaterialStatePropertyAll(Size(0.01, 0.01)),
@@ -390,11 +387,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           SecondPrecMatrix = PrecMatrix;
                           SecondHumMatrix = HumiMatrix;
                           currentDay = first;
+                          returnPrec();
+                          returnHum();
+                          returnTemp();
+                          okay = okay0;
+                          cancel = cancel0;
+                          changeTime = changeTime0;
+                          selectTime = selectTime0;
                           openSecondScreen(context);
                         },
-                        child: Text("$first"),
+                        child:
+                            Text("$first", style: TextStyle(color: nightflag)),
                         style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(colors2),
+                            backgroundColor: MaterialStatePropertyAll(colors),
                             fixedSize: MaterialStatePropertyAll(Size(200, 40))),
                       ))),
               Padding(
@@ -409,11 +414,21 @@ class _MyHomePageState extends State<MyHomePage> {
                           SecondPrecMatrix = PrecMatrix;
                           SecondHumMatrix = HumiMatrix;
                           currentDay = second;
+                          returnPrec();
+                          returnHum();
+                          returnTemp();
+                          okay = okay0;
+                          cancel = cancel0;
+                          changeTime = changeTime0;
+                          selectTime = selectTime0;
                           openSecondScreen(context);
                         },
-                        child: Text("$second"),
+                        child: Text(
+                          "$second",
+                          style: TextStyle(color: nightflag),
+                        ),
                         style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(colors2),
+                            backgroundColor: MaterialStatePropertyAll(colors),
                             fixedSize: MaterialStatePropertyAll(Size(200, 40))),
                       ))),
               Padding(
@@ -428,11 +443,22 @@ class _MyHomePageState extends State<MyHomePage> {
                           SecondHumMatrix = HumiMatrix;
 
                           currentDay = third;
+                          returnPrec();
+                          returnHum();
+                          returnTemp();
+                          okay = okay0;
+                          cancel = cancel0;
+                          changeTime = changeTime0;
+                          selectTime = selectTime0;
+
                           openSecondScreen(context);
                         },
-                        child: Text("$third"),
+                        child: Text(
+                          "$third",
+                          style: TextStyle(color: nightflag),
+                        ),
                         style: ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll(colors2),
+                            backgroundColor: MaterialStatePropertyAll(colors),
                             fixedSize: MaterialStatePropertyAll(Size(200, 40))),
                       )))
             ]))));
@@ -459,8 +485,14 @@ class _MyHomePageState extends State<MyHomePage> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
           backgroundColor: colors2,
-          title: Text('$SettingsLang'),
-          content: Text('$NotifyMes'),
+          title: Text(
+            '$SettingsLang',
+            style: TextStyle(color: nightflag),
+          ),
+          content: Text(
+            '$NotifyMes',
+            style: TextStyle(color: nightflag),
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -491,7 +523,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future<void> _showPopup2(BuildContext context) async {
+  Future<void> showPopup2(BuildContext context) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -501,7 +533,9 @@ class _MyHomePageState extends State<MyHomePage> {
           backgroundColor: colors2,
           title: Text('                      $Stats'),
           content: Text(
-              '$AveragePrec : $realAVGPrec%                                                                        $AverageTemp : $realAVGTemp°C                                                                  $AverageHum : $realAVGHum%                                               '),
+            '$AveragePrec : $realAVGPrec%                                                                        $AverageTemp : $realAVGTemp°C                                                                  $AverageHum : $realAVGHum%                                               ',
+            style: TextStyle(color: nightflag),
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -522,7 +556,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void returnPrec() {
     for (int i = 0; i <= 23; i++) {
-      AVGPrec = AVGPrec + PrecMatrix[1][i];
+      AVGPrec = AVGPrec + PrecMatrix[dayflag][i];
     }
     realAVGPrec = (AVGPrec / 24).toStringAsFixed(2);
 
@@ -531,7 +565,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void returnHum() {
     for (int i = 0; i <= 23; i++) {
-      AVGHum = AVGHum + HumiMatrix[1][i];
+      AVGHum = AVGHum + HumiMatrix[dayflag][i];
     }
     realAVGHum = (AVGHum / 24).toStringAsFixed(2);
 
@@ -540,7 +574,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void returnTemp() {
     for (int i = 0; i <= 23; i++) {
-      AVGTemp = AVGTemp + TempMatrix[1][i];
+      AVGTemp = AVGTemp + TempMatrix[dayflag][i];
     }
 
     realAVGTemp = (AVGTemp / 24).toStringAsFixed(2);
@@ -561,5 +595,59 @@ class _MyHomePageState extends State<MyHomePage> {
     });
     // Perform any other actions based on the new slider value
     // You can add your custom logic here
+  }
+
+  void _showAlertDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: colors2,
+          title: Text(
+            'Sign In',
+            style: TextStyle(color: nightflag),
+          ),
+          content: Column(
+            children: [
+              TextField(
+                  controller: controller,
+                  onSubmitted: (String value) {
+                    setState(() async {
+                      text = controller.text;
+                      final response = await http.post(
+                          Uri.https(
+                              "weather-app-d14d8-default-rtdb.asia-southeast1.firebasedatabase.app",
+                              "Names.json"),
+                          headers: {"Content-Type": "application/json"},
+                          body: json.encode({"email": text}));
+                      changeStatus();
+                      // print((response.body));
+                      // print(response.statusCode);
+                      // Navigator.of(context).pop();
+                    });
+                  })
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                // Close the alert dialog
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Close',
+                style: TextStyle(color: nightflag),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void changeStatus() {
+    setState(() {
+      showStatus = "Logged in as $text";
+    });
   }
 }

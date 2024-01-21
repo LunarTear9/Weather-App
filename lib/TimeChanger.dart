@@ -48,7 +48,7 @@ class _LiveTimeWidgetState extends State<LiveTimeWidget> {
   Widget build(BuildContext context) {
     return Text(
       _currentTime,
-      style: TextStyle(fontSize: 24),
+      style: TextStyle(fontSize: 24, color: nightflag),
     );
   }
 }
