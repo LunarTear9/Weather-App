@@ -23,8 +23,8 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.anothertest"
-    compileSdkVersion flutter.compileSdkVersion
+    namespace "com.example.newweatherapp"
+    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -42,8 +42,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        multiDexEnabled true
-        applicationId "com.example.anothertest"
+        applicationId "com.example.newweatherapp"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion flutter.minSdkVersion
@@ -65,7 +64,4 @@ flutter {
     source '../..'
 }
 
-dependencies {
-  
-   implementation 'androidx.multidex:multidex:2.0.1'
-}
+dependencies {}
