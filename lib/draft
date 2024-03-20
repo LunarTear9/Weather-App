@@ -1,0 +1,115 @@
+ int Timer = 0;
+List<List<int>> CloudMatrix =
+      List.generate(7, (index) => List<int>.filled(24, 0));
+  List<List<double>> TempMatrix =
+      List.generate(7, (index) => List<double>.filled(24, 0));
+  List<List<int>> PrecMatrix =
+      List.generate(7, (index) => List<int>.filled(24, 0));
+  List<List<int>> HumiMatrix =
+      List.generate(7, (index) => List<int>.filled(24, 0));
+
+  @override
+  void initState() {
+    super.initState();
+    controller = TextEditingController();
+    InAppWebViewPlatform.instance;
+    fetchData();
+    
+    getDayOfWeek(now.weekday);
+
+    
+  }
+
+  Future<void> fetchData() async {
+    loading = true;
+    try {
+      LanguageIndex = 1;
+      ChangeLanguage();
+      final response = await http.get(Uri.parse(
+          'https://api.open-meteo.com/v1/forecast?latitude=35.6854&longitude=139.7531&current=temperature_2m,apparent_temperature,precipitation,cloud_cover,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,cloud_cover'));
+
+      if (response.statusCode == Okay) {
+        // Parse JSON response
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        // Extract values
+        final List<int> cloudTotal = List<int>.from(data['hourly']['cloud_cover']);
+        final apparenttemperature = data['current']['apparent_temperature'];
+        final cloudcover = data['current']['cloud_cover'];
+        final windSpeed = data['current']['wind_speed_10m'];
+        
+        final currentPrecipitation =data['current']['precipitation'];
+        final currentTemperature = data['current']['temperature_2m'];
+        final List<String> timeList = List<String>.from(data['hourly']['time']);
+        final List<double> temperatureList =
+            List<double>.from(data['hourly']['temperature_2m']);
+        final List<int> precipitationList =
+            List<int>.from(data['hourly']['precipitation_probability']);
+        final List<int> humidityList =
+            List<int>.from(data['hourly']['relative_humidity_2m']);
+
+        // Save values to variables
+        setState(() {
+          for (int i = 0; i <= 6; i++) {
+            for (int j = 0; j <= 23; j++) {
+              currentPrecipitationNow = currentPrecipitation;
+currentTemperatureNow = currentTemperature;
+currentApparentNow = apparenttemperature;
+currentCloudNow = cloudcover;
+currentwindspeed = windSpeed;
+              CloudMatrix[i][j] = cloudTotal[tempflag];
+              PrecMatrix[i][j] = precipitationList[tempflag];
+              TempMatrix[i][j] = temperatureList[tempflag];
+              HumiMatrix[i][j] = humidityList[tempflag];
+            
+              tempflag = tempflag + 1;
+              changeView();
+            }
+          }
+          for (int i = 0; i<=6;i++){
+            dayflag = i;
+            returnPrec();
+            returnTemp();
+          }
+
+          void _saveMatrixData() async {
+            final matrixBox = await Hive.openBox('matrixBox');
+
+            for (int i = 0; i < PrecMatrix.length; i++) {
+              final row = PrecMatrix[i];
+              for (int j = 0; j < row.length; j++) {
+                final element = MatrixElement(row[j]);
+                matrixBox.add(element);
+              }
+            }
+          }
+
+          _saveMatrixData();
+          timeList.clear();
+          precipitationList.clear();
+          humidityList.clear();
+          hourlyTemperature.clear();
+          precipitationperhour.clear();
+          totalhumidity.clear();
+          controller.dispose();
+        });
+
+        // Print specific data from the lists
+        print('Third hour time: ${hourlyTime[x.toInt()]}');
+        print('Fourth hour temperature: ${hourlyTemperature[x.toInt()]}');
+      } else {
+        // Handle errors
+        print('Failed to load data. Status code: ${response.statusCode}');
+      }
+
+      setState(() {
+        loading = false; // Set loading to false when data fetching is complete
+      });
+    } catch (error) {
+      // Handle errors
+      print('Error: $error');
+      setState(() {
+        loading = false; // Set loading to false even if there's an error
+      });
+    }
+  }
