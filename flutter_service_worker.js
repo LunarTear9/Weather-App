@@ -3,9 +3,9 @@ const MANIFEST = 'flutter-app-manifest';
 const TEMP = 'flutter-temp-cache';
 const CACHE_NAME = 'flutter-app-cache';
 
-const RESOURCES = {"assets/AssetManifest.bin": "6331ff9bb223acb3cbaeeeb6f5b0f48c",
-"assets/AssetManifest.bin.json": "81e5336535754c645bee0b35f8ff8d69",
-"assets/AssetManifest.json": "562735f28fc94377a02f95fc0b3f8298",
+const RESOURCES = {"assets/AssetManifest.bin": "3171aa122319a63d6ba85771d5d54a74",
+"assets/AssetManifest.bin.json": "d592d6ebdd7d61734ffe9fd2289e99f0",
+"assets/AssetManifest.json": "751ac433d8222e796638b86c3a2b0ca7",
 "assets/FontManifest.json": "dc3d03800ccca4601324923c0b1d6d57",
 "assets/fonts/MaterialIcons-Regular.otf": "fa68c6a05d3622662af1d903c5eb10d4",
 "assets/lib/assets/25231.png": "ec3a60c8c6539a07eb70b52f6737ea6e",
@@ -18,6 +18,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "6331ff9bb223acb3cbaeeeb6f5b0f48c
 "assets/lib/assets/heavy-rain3.png": "351046e5f53a0c5ef40e23373e967538",
 "assets/lib/assets/sky.jpg": "a8f29a9dd54039a459a312b6fda2728f",
 "assets/lib/assets/sky1.jpg": "30aba21afe2ddd160ed7cf627b9b1a61",
+"assets/lib/assets/splash.png": "27e3703c45be41f303831018eba4e83b",
 "assets/lib/assets/sun%2520(1).png": "5760fc83f8af8529ce0b1532a8dd8c82",
 "assets/lib/assets/sun%2520(2).png": "476249666a5d0fd39d4239627ec8fb27",
 "assets/lib/assets/sun.png": "e54666e665438f6249f36062b93807af",
@@ -25,7 +26,7 @@ const RESOURCES = {"assets/AssetManifest.bin": "6331ff9bb223acb3cbaeeeb6f5b0f48c
 "assets/lib/assets/water.png": "64492c9e70ab283eea5b3932a337fadf",
 "assets/lib/assets/water2.png": "54c8864fb5f9700e34d62f60858c6288",
 "assets/lib/assets/wind.png": "29baec976118e58a2fd53ef26fb10d2d",
-"assets/NOTICES": "8c776a0f1f898d88f0ae3465161ec50e",
+"assets/NOTICES": "733a9a28899352a3238d0bb4442f48c0",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "1e849163f8c073324698731a2caf2eef",
 "assets/shaders/ink_sparkle.frag": "ecc85a2e95f5e9f53123dcaf8cb9b6ce",
 "canvaskit/canvaskit.js": "c86fbd9e7b17accae76e5ad116583dc4",
@@ -44,10 +45,18 @@ const RESOURCES = {"assets/AssetManifest.bin": "6331ff9bb223acb3cbaeeeb6f5b0f48c
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
-"index.html": "73ea8b36557231c3cf1bee133bd92210",
-"/": "73ea8b36557231c3cf1bee133bd92210",
-"main.dart.js": "aabf09872fa249598120e16cc4f624ff",
+"index.html": "78140cb4be7ac4990536b1deff81a918",
+"/": "78140cb4be7ac4990536b1deff81a918",
+"main.dart.js": "8dc2473f5006d024fb483a4d5591f667",
 "manifest.json": "f4f9a2c031137f64a763d50636a20d53",
+"splash/img/dark-1x.png": "6bc1e3869c12393ea83b83b4975e817f",
+"splash/img/dark-2x.png": "2038d02d2b6af3e2125193e4e0dc1ce5",
+"splash/img/dark-3x.png": "9eb39964f1968fcfe6edf1ea259664c9",
+"splash/img/dark-4x.png": "7568c216d5947b45be0861a34ade8305",
+"splash/img/light-1x.png": "6bc1e3869c12393ea83b83b4975e817f",
+"splash/img/light-2x.png": "2038d02d2b6af3e2125193e4e0dc1ce5",
+"splash/img/light-3x.png": "9eb39964f1968fcfe6edf1ea259664c9",
+"splash/img/light-4x.png": "7568c216d5947b45be0861a34ade8305",
 "version.json": "c82a96a267490cbb773d7ec2303b346e"};
 // The application shell files that are downloaded before a service worker can
 // start.
