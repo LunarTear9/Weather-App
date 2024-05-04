@@ -27,13 +27,16 @@ String Dayplusone = "Tuesday";
 String Dayplustwo = "Wednesday";
 String Dayplusthree = "Thursday";
 String Dayplusfour = "Friday";
+String timezone = "Asia/Tokyo";
 String Dayplusfive = "Saturday";
 String Dayplussix = "Sunday";
+bool index = false;
 String StartingDay = first;
 class LiveTimeWidget extends StatefulWidget {
   @override
   final String month;
-  LiveTimeWidget({super.key,required this.month});
+  final String timezone;
+  LiveTimeWidget({super.key,required this.month,required this.timezone});
   LiveTimeWidgetState createState() => LiveTimeWidgetState();
 }
 
@@ -43,17 +46,21 @@ class LiveTimeWidgetState extends State<LiveTimeWidget> {
   
   late String _currentDay;
 
+  
+
   @override
   void initState() {
+
+
     super.initState();
-    _updateTime();
+    _updateTime(timezone);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _updateTime();
+      _updateTime(timezone);
     });
   }
 
-  void _updateTime() {
-    final location = tz.getLocation('Asia/Tokyo');
+  void _updateTime(timezone) {
+    final location = tz.getLocation(timezone);
     final now = tz.TZDateTime.now(location);
     _currentTime = DateFormat('HH:mm').format(now);
     if (month != '四月') {

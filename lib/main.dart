@@ -5,7 +5,7 @@ import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-
+import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:newweatherapp/TimeChanger.dart';
 import 'package:newweatherapp/container.dart';
@@ -20,10 +20,12 @@ import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
+bool _isButtonDisabled = false;
+const int cooldownDuration = 5;
 int ClockIndx = 0;
 int tempflag = 0;
 int humidity = 0;
+String currentTimezone = "Asia/Tokyo";
 double currentTemperatureNow = 0;
 double apparenttemperature = 0;
 int cloudcover = 0;
@@ -46,8 +48,8 @@ double AVGprec = 0;
 String Precipitation = 'Precipitation';
 List<double> AVGPrec2 = List<double>.filled(7, 0);
 List<double> AVGCloud2 = List<double>.filled(7, 0);
-int long = 35;
-int lat = 139;
+int long = 0;
+int lat = 0;
 
 final Uri _url = Uri.parse('https://github.com/LunarTear9/Weather-App');
 
@@ -121,15 +123,15 @@ class MainHomeScreenState extends State<MainHomeScreen> {
       List.generate(7, (index) => List<int>.filled(24, 0));
   void initState() {
     super.initState();
-    fetchData();
+    fetchWeatherForLocation(35.6895, 139.6917);
   }
 
-  Future<void> fetchData() async {
+  Future<void> fetchData( longitude, latitude) async {
     try {
       //LanguageIndex = 1;
       //ChangeLanguage();
       final response = await http.get(Uri.parse(
-          'https://api.open-meteo.com/v1/forecast?latitude=$long.6854&longitude=$lat.7531&current=temperature_2m,apparent_temperature,precipitation,cloud_cover,relative_humidity_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,precipitation_probability,cloud_cover'));
+          'https://api.open-meteo.com/v1/forecast?latitude=$longitude&longitude=$latitude&current=temperature_2m,apparent_temperature,precipitation,cloud_cover,relative_humidity_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,precipitation_probability,cloud_cover'));
 
       if (response.statusCode == 200) {
         // Parse JSON response
@@ -172,7 +174,10 @@ class MainHomeScreenState extends State<MainHomeScreen> {
 
             tempflag = tempflag + 1;
           }
+
         }
+
+        tempflag = 0;
         // for (int i = 0; i<=6;i++){
         // dayflag = i;
         returnPrec();
@@ -205,7 +210,13 @@ class MainHomeScreenState extends State<MainHomeScreen> {
       print('Error: $error');
     }
   }
+void fetchWeatherForLocation( latitude,  longitude) {
+  fetchData(latitude, longitude);
+}
+dynamic callLiveTimeWidget(){
 
+  return LiveTimeWidget(month: month,timezone: currentTimezone);
+}
   @override
   Widget build(BuildContext context) {
     
@@ -316,7 +327,7 @@ class MainHomeScreenState extends State<MainHomeScreen> {
                               width: 4,
                               height: 0,
                             ),
-                            LiveTimeWidget(month: month),
+                            Padding(padding: EdgeInsets.only(top:4),child: LiveTimeWidget(month: month,timezone: currentTimezone)),
                             const SizedBox(
                               width: 100,
                               height: 10,
@@ -325,10 +336,46 @@ class MainHomeScreenState extends State<MainHomeScreen> {
                               padding: const EdgeInsets.all(8.0),
                               child: Column(children: [
                                 returnStatusMainImage(0),
-                                Text(
-                                  '$country ,$city',
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 32),
+                                SizedBox(height: 18,width: 2,),
+                                OutlinedButton(
+
+// Inside the onPressed callback of the OutlinedButton
+onPressed: () {
+  if (!_isButtonDisabled) {
+    setState(() {
+      // Disable the button
+      _isButtonDisabled = true;
+    });
+
+    // Start a timer to enable the button after a cooldown duration
+    Timer(Duration(seconds: cooldownDuration), () {
+      setState(() {
+        // Enable the button
+        _isButtonDisabled = false;
+      });
+    });
+
+    // Your existing logic for changing location and fetching weather data
+    setState(() {
+      if (city == "Athens") {
+        city = "Tokyo";
+        country = "Japan";
+        timezone = "Asia/Tokyo";
+        fetchWeatherForLocation(35.6895, 139.6917);
+      } else {
+        city = "Athens";
+        country = "Greece";
+        timezone = "Europe/Athens";
+        fetchWeatherForLocation(37.9838, 23.7278);
+      }
+    });
+  }
+},
+                                  child: Text(
+                                    '$country ,$city',
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 32),
+                                  ),
                                 )
                               ]),
                             ),
@@ -2636,7 +2683,7 @@ class _ChoiceWidgetState extends State<ChoiceWidget> {
                     Language = 'Language';
                     English = 'English';
                     Japanese = 'Japanese';
-                    LiveTimeWidget(month: month);
+                    LiveTimeWidget(month: month,timezone: currentTimezone,);
                     /* SettingsLang = 'Settings';
         NotifyMes = 'Choose a language';
         AverageHum = 'Average Humidity';*/
@@ -2679,7 +2726,7 @@ class _ChoiceWidgetState extends State<ChoiceWidget> {
                   Language = '言語';
                   English = '英語';
                   Japanese = '日本語';
-                  LiveTimeWidget(month: month);
+                  LiveTimeWidget(month: month,timezone: currentTimezone);
                   first = '月曜日';
                   second = '火曜日';
                   third = '水曜日';
