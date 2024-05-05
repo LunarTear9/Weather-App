@@ -3,6 +3,7 @@
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar.dart';
 import 'package:curved_labeled_navigation_bar/curved_navigation_bar_item.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
@@ -78,9 +79,13 @@ List<_SalesData> data = [
   _SalesData('May', 40, 0)
 ];
 
+
+
+
 void main() {
   runApp(const MaterialApp(
     home: MainHomeScreen(),
+   
     debugShowCheckedModeBanner: false,
   ));
   debugPaintSizeEnabled = false;
@@ -98,6 +103,14 @@ class MainHomeScreen extends StatefulWidget {
 
   @override
   State<MainHomeScreen> createState() => MainHomeScreenState();
+}
+class MyCustomScrollBheavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
 }
 
 class MainHomeScreenState extends State<MainHomeScreen> {
@@ -217,12 +230,16 @@ dynamic callLiveTimeWidget(){
 
   return LiveTimeWidget(month: month,timezone: currentTimezone);
 }
+
+
   @override
   Widget build(BuildContext context) {
     
     DateTime now = DateTime.now();
     String formattedHour = DateFormat('HH').format(now);
     return MaterialApp(
+      
+      scrollBehavior: MyCustomScrollBheavior(),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         extendBodyBehindAppBar: true,
