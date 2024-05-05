@@ -1,16 +1,10 @@
-# newweatherapp
+# Features
 
-A new Flutter project.
+- Live Time: Precipitation,Cloud Cover,Humidity and more
 
-## Getting Started
+- Multiple regions
 
-This project is a starting point for a Flutter application.
+- Up to 7 days of data
 
-A few resources to get you started if this is your first Flutter project:
+- ENG and JP lang supported
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
