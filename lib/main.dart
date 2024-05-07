@@ -25,7 +25,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 bool _isButtonDisabled = false;
 const int cooldownDuration = 5;
-int countryIndex = 1;
+int countryIndex = 0;
 int ClockIndx = 0;
 int updateIndex = 0;
 int animationValueController = 1;
@@ -527,13 +527,14 @@ dynamic callLiveTimeWidget(){
                 controller: _pageController,
                 children: [
                   Center(
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: Duration(seconds: 1),
                       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
                       
                       height: double.infinity,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: returnImageWidget(), fit: BoxFit.fill),
+                            image: returnImageWidget(), fit: BoxFit.cover)
                       ),
                       child: SingleChildScrollView(
                         child: Column(
@@ -901,49 +902,29 @@ onPressed: () {
                                                     ));
                                               });
                                         },
-                                        child: ListTile(
-                                          subtitle: Text('$currentTemperatureNow°C',
-                                              style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
-                                          leading: returnStatusImage(0),
-                                          title: Text('$today',
-                                              style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
-                                          trailing: SingleChildScrollView(
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize
-                                                  .min, // Ensures the row only takes the minimum required space
-                                              children: [
-                                                // Add your widgets here
-              
-                                                Column(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Container(
-                                                        height: 35,
-                                                        width: 35,
-                                                        decoration: const BoxDecoration(
-                                                            image: DecorationImage(
-                                                                image: AssetImage(
-                                                                    'lib/assets/heavy-rain.png'))),
-                                                      ),
-                                                      Text(
-                                                        '${AVGPrec2[0].toInt()}%',
-                                                        style: const TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 12),
-                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
-                                                    ]),
-              
-                                                // Add spacing between widgets
-                                                Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        left: 16, right: 16),
-                                                    child: Column(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
+                                        child: GestureDetector(
+                                          
+                                          child: AnimatedContainer(
+                                            duration: Duration.zero,
+                                            child: ListTile(
+                                              subtitle: Text('$currentTemperatureNow°C',
+                                                  style: const TextStyle(
+                                                      color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
+                                              leading: returnStatusImage(0),
+                                              title: Text('$today',
+                                                  style: const TextStyle(
+                                                      color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
+                                              trailing: SingleChildScrollView(
+                                                physics:
+                                                    const NeverScrollableScrollPhysics(),
+                                                child: Row(
+                                                  mainAxisSize: MainAxisSize
+                                                      .min, // Ensures the row only takes the minimum required space
+                                                  children: [
+                                                    // Add your widgets here
+                                                          
+                                                    Column(
+                                                        mainAxisSize: MainAxisSize.min,
                                                         children: [
                                                           Container(
                                                             height: 35,
@@ -951,31 +932,57 @@ onPressed: () {
                                                             decoration: const BoxDecoration(
                                                                 image: DecorationImage(
                                                                     image: AssetImage(
-                                                                        'lib/assets/clouddisplay.png'))),
+                                                                        'lib/assets/heavy-rain.png'))),
                                                           ),
                                                           Text(
-                                                              '${AVGCloud2[0].toInt()}%',
+                                                            '${AVGPrec2[0].toInt()}%',
+                                                            style: const TextStyle(
+                                                                color: Colors.white,
+                                                                fontSize: 12),
+                                                          ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
+                                                        ]),
+                                                          
+                                                    // Add spacing between widgets
+                                                    Padding(
+                                                        padding: const EdgeInsets.only(
+                                                            left: 16, right: 16),
+                                                        child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize.min,
+                                                            children: [
+                                                              Container(
+                                                                height: 35,
+                                                                width: 35,
+                                                                decoration: const BoxDecoration(
+                                                                    image: DecorationImage(
+                                                                        image: AssetImage(
+                                                                            'lib/assets/clouddisplay.png'))),
+                                                              ),
+                                                              Text(
+                                                                  '${AVGCloud2[0].toInt()}%',
+                                                                  style: const TextStyle(
+                                                                      color: Colors.white,
+                                                                      fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
+                                                            ])),
+                                                    Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Container(
+                                                            height: 35,
+                                                            width: 35,
+                                                            decoration: const BoxDecoration(
+                                                                image: DecorationImage(
+                                                                    image: AssetImage(
+                                                                        'lib/assets/water2.png'))),
+                                                          ),
+                                                          Text('$currentHumidityNow%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
                                                                   fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
-                                                        ])),
-                                                Column(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    children: [
-                                                      Container(
-                                                        height: 35,
-                                                        width: 35,
-                                                        decoration: const BoxDecoration(
-                                                            image: DecorationImage(
-                                                                image: AssetImage(
-                                                                    'lib/assets/water2.png'))),
-                                                      ),
-                                                      Text('$currentHumidityNow%',
-                                                          style: const TextStyle(
-                                                              color: Colors.white,
-                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
-                                                    ]),
-                                              ],
+                                                        ]),
+                                                  ],
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -2617,10 +2624,17 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
       return const AssetImage(
         'lib/assets/sky.jpg',
       );
-    } else {
+    } else if (countryIndex == 0) {
       return const AssetImage(
-        'lib/assets/sky1.jpg',
+        'lib/assets/background.png',
       );
+      
+    }
+    else if(countryIndex == 1) {
+
+      
+      
+      return const AssetImage('lib/assets/athens-transport-background.jpg');
     }
   }
 
