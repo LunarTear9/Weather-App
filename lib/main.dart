@@ -7,7 +7,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:newweatherapp/TimeChanger.dart';
 import 'package:newweatherapp/container.dart';
 import 'package:flutter/foundation.dart';
@@ -23,7 +25,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 bool _isButtonDisabled = false;
 const int cooldownDuration = 5;
+int countryIndex = 1;
 int ClockIndx = 0;
+int updateIndex = 0;
+int animationValueController = 1;
 int tempflag = 0;
 int humidity = 0;
 String currentTimezone = "Asia/Tokyo";
@@ -49,6 +54,7 @@ double AVGprec = 0;
 String Precipitation = 'Precipitation';
 List<double> AVGPrec2 = List<double>.filled(7, 0);
 List<double> AVGCloud2 = List<double>.filled(7, 0);
+List<double> temperaturesListValue = List<double>.filled(7, 24);
 int long = 0;
 int lat = 0;
 
@@ -83,6 +89,7 @@ List<_SalesData> data = [
 
 
 void main() {
+  
   runApp(const MaterialApp(
     home: MainHomeScreen(),
    
@@ -99,6 +106,7 @@ void ClockIndex() async {
 }
 
 class MainHomeScreen extends StatefulWidget {
+  
   const MainHomeScreen({super.key});
 
   @override
@@ -136,16 +144,160 @@ class MainHomeScreenState extends State<MainHomeScreen> {
       List.generate(7, (index) => List<int>.filled(24, 0));
   void initState() {
     super.initState();
+    
     fetchWeatherForLocation(35.6895, 139.6917);
   }
 
   Future<void> fetchData( longitude, latitude) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+     double? temperatureValue = prefs.getDouble('currentTemperatureNow');
+     int? cloudValue = prefs.getInt('currentCloudNow');
+     double? PrecValue = prefs.getDouble('currentPrecipitationNow');
+     double? WindValue = prefs.getDouble('currentwindspeed');
+     int? humidityValue = prefs.getInt('currentHumidityNow');
+     double? apparentValue = prefs.getDouble('currentApparentNow');
+     List<String>? temperatureStringList = prefs.getStringList('currentTemperatureStringList');
+     List<String>? precipitationStringList = prefs.getStringList('currentPrecipitationStringList');
+     List<String>? humidityStringList = prefs.getStringList('currentHumidityStringList');
+     List<String>? cloudStringList = prefs.getStringList('currentCloudStringList');
+     List<String>? dewStringList = prefs.getStringList('currentDewpointNow');
+
+     
+
+
+     if (temperatureStringList != null && countryIndex == 0 && updateIndex > 1) {
+  List<double> temperatureList = temperatureStringList.map((String s) => double.parse(s)).toList();
+  List<int> precipitationList = precipitationStringList!.map((String s) => int.parse(s)).toList();
+  List<int> humidityList = humidityStringList!.map((String s) => int.parse(s)).toList();
+  List<int> cloudList = cloudStringList!.map((String s) => int.parse(s)).toList();
+  List<double> dewString = dewStringList!.map((String s) => double.parse(s)).toList();
+  
+  setState(() {
+    for (int i = 0; i <= 6; i++) {
+          for (int j = 0; j <= 23; j++) {
+            CloudMatrix[i][j] = cloudList[tempflag];
+            HumiMatrix[i][j] = humidityList[tempflag];
+            TempMatrix[i][j] = temperatureList[tempflag];
+            PrecMatrix[i][j] = precipitationList[tempflag];
+            DewMatrix[i][j] = dewString[tempflag];
+           
+            tempflag = tempflag + 1;
+          }
+           
+    }
+    returnPrec();
+    returnCloud();
+    returnImageWidget();
+    
+    tempflag = 0;
+    
+  });
+  
+  // Now temperatureList contains the temperatures as doubles
+}
+     
+
+     if (temperatureValue != null && countryIndex == 0 && updateIndex > 1){
+     
+      setState(() {
+  
+         currentPrecipitationNow = PrecValue!;
+    
+         currentCloudNow = cloudValue!;
+         currentTemperatureNow = temperatureValue;
+         currentwindspeed = WindValue!;
+         
+         currentHumidityNow = humidityValue!;
+         currentApparentNow = apparentValue!;
+         
+      
+        
+      });
+        tempflag = 0;
+         
+
+      return ;
+     }
+
+     
+    double? temperatureVal2ue = prefs.getDouble('currentTemperatureNow2');
+     int? cloudValue2 = prefs.getInt('currentCloudNow2');
+     double? PrecValue2 = prefs.getDouble('currentPrecipitationNow2');
+     double? WindValue2 = prefs.getDouble('currentwindspeed2');
+     int? humidityValue2 = prefs.getInt('currentHumidityNow2');
+     double? apparentValue2 = prefs.getDouble('currentApparentNow2');
+     List<String>? temperatureStringList2 = prefs.getStringList('currentTemperatureStringList2');
+     List<String>? precipitationStringList2 = prefs.getStringList('currentPrecipitationStringList2');
+     List<String>? humidityStringList2 = prefs.getStringList('currentHumidityStringList2');
+     List<String>? cloudStringList2 = prefs.getStringList('currentCloudStringList2');
+     List<String>? dewStringList2 = prefs.getStringList('currentDewpointNow2');
+     
+
+
+     if (temperatureStringList2 != null && countryIndex == 1 && updateIndex > 2) {
+  List<double> temperatureList = temperatureStringList2.map((String s) => double.parse(s)).toList();
+  List<int> precipitationList = precipitationStringList2!.map((String s) => int.parse(s)).toList();
+  List<int> humidityList = humidityStringList2!.map((String s) => int.parse(s)).toList();
+  List<int> cloudList = cloudStringList2!.map((String s) => int.parse(s)).toList();
+  List<double> dewString2 = dewStringList2!.map((String s) => double.parse(s)).toList();
+  
+  setState(() {
+    for (int i = 0; i <= 6; i++) {
+          for (int j = 0; j <= 23; j++) {
+            CloudMatrix[i][j] = cloudList[tempflag];
+            HumiMatrix[i][j] = humidityList[tempflag];
+            TempMatrix[i][j] = temperatureList[tempflag];
+            PrecMatrix[i][j] = precipitationList[tempflag];
+            DewMatrix[i][j] = dewString2[tempflag];
+            
+           
+            tempflag = tempflag + 1;
+          }
+           
+    }
+    returnPrec();
+    returnCloud();
+    returnImageWidget();
+    
+    tempflag = 0;
+    
+  });
+  
+  // Now temperatureList contains the temperatures as doubles
+}
+     
+
+     if (temperatureVal2ue != null && countryIndex == 1 && updateIndex > 2){
+     
+      setState(() {
+  
+         currentPrecipitationNow = PrecValue2!;
+    
+         currentCloudNow = cloudValue2!;
+         currentTemperatureNow = temperatureVal2ue;
+         currentwindspeed = WindValue2!;
+         
+         currentHumidityNow = humidityValue2!;
+         currentApparentNow = apparentValue2!;
+         
+      
+        
+      });
+        tempflag = 0;
+         
+
+      return ;
+     }
+
+     
+
     try {
       //LanguageIndex = 1;
       //ChangeLanguage();
       final response = await http.get(Uri.parse(
           'https://api.open-meteo.com/v1/forecast?latitude=$longitude&longitude=$latitude&current=temperature_2m,apparent_temperature,precipitation,cloud_cover,relative_humidity_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,precipitation_probability,cloud_cover'));
-
+print('api call');
       if (response.statusCode == 200) {
         // Parse JSON response
         final Map<String, dynamic> data = json.decode(response.body);
@@ -166,6 +318,7 @@ class MainHomeScreenState extends State<MainHomeScreen> {
             List<double>.from(data['hourly']['temperature_2m']);
         final List<int> precipitationList =
             List<int>.from(data['hourly']['precipitation_probability']);
+            
         final List<int> humidityList =
             List<int>.from(data['hourly']['relative_humidity_2m']);
 
@@ -180,6 +333,7 @@ class MainHomeScreenState extends State<MainHomeScreen> {
             currentwindspeed = windSpeed;
             currentHumidityNow = humidity;
             DewMatrix[i][j] = dewPoint[tempflag];
+            
             CloudMatrix[i][j] = cloudTotal[tempflag];
             PrecMatrix[i][j] = precipitationList[tempflag];
             TempMatrix[i][j] = temperatureList[tempflag];
@@ -189,7 +343,50 @@ class MainHomeScreenState extends State<MainHomeScreen> {
           }
 
         }
+        if (countryIndex == 0){
+await prefs.setDouble('currentPrecipitationNow', currentPrecipitationNow);
 
+await prefs.setStringList('currentDewpointNow', dewPoint.map((double d) => d.toString()).toList());
+// Save an boolean value to 'repeat' key.
+await prefs.setDouble('currentTemperatureNow', currentTemperatureNow);
+// Save an double value to 'decimal' key.
+await prefs.setDouble('currentApparentNow', currentApparentNow);
+// Save an boolean value to 'repeat' key.
+await prefs.setInt('currentCloudNow', currentCloudNow);
+// Save an double value to 'decimal' key.
+await prefs.setDouble('currentwindspeed', currentwindspeed);
+// Save an boolean value to 'repeat' key.
+await prefs.setInt('currentHumidityNow', currentHumidityNow);
+
+await prefs.setStringList('currentPrecipitationStringList', precipitationList.map((dynamic d) => d.toString()).toList());
+await prefs.setStringList('currentCloudStringList', cloudTotal.map((dynamic d) => d.toString()).toList());
+await prefs.setStringList('currentHumidityStringList', humidityList.map((dynamic d) => d.toString()).toList());
+await prefs.setStringList('currentTemperatureStringList', temperatureList.map((double d) => d.toString()).toList());
+
+// Save an double value to 'decimal' key.
+        }
+
+        if (countryIndex == 1){
+await prefs.setDouble('currentPrecipitationNow2', currentPrecipitationNow);
+await prefs.setStringList('currentDewpointNow2', dewPoint.map((double d) => d.toString()).toList());
+// Save an boolean value to 'repeat' key.
+await prefs.setDouble('currentTemperatureNow2', currentTemperatureNow);
+// Save an double value to 'decimal' key.
+await prefs.setDouble('currentApparentNow2', currentApparentNow);
+// Save an boolean value to 'repeat' key.
+await prefs.setInt('currentCloudNow2', currentCloudNow);
+// Save an double value to 'decimal' key.
+await prefs.setDouble('currentwindspeed2', currentwindspeed);
+// Save an boolean value to 'repeat' key.
+await prefs.setInt('currentHumidityNow2', currentHumidityNow);
+
+await prefs.setStringList('currentPrecipitationStringList2', precipitationList.map((dynamic d) => d.toString()).toList());
+await prefs.setStringList('currentCloudStringList2', cloudTotal.map((dynamic d) => d.toString()).toList());
+await prefs.setStringList('currentHumidityStringList2', humidityList.map((dynamic d) => d.toString()).toList());
+await prefs.setStringList('currentTemperatureStringList2', temperatureList.map((double d) => d.toString()).toList());
+
+// Save an double value to 'decimal' key.
+        }
         tempflag = 0;
         // for (int i = 0; i<=6;i++){
         // dayflag = i;
@@ -197,18 +394,20 @@ class MainHomeScreenState extends State<MainHomeScreen> {
         returnCloud();
         // returnTemp();
         // }
+        updateIndex = updateIndex + 1;
         setState(() {
           loading =
               false; // Set loading to false when data fetching is complete
+        
         });
-
+      
         timeList.clear();
         precipitationList.clear();
         humidityList.clear();
         hourlyTemperature.clear();
         precipitationperhour.clear();
         totalhumidity.clear();
-
+      
         // Print specific data from the lists
       } else {
         // Handle errors
@@ -312,7 +511,7 @@ dynamic callLiveTimeWidget(){
           },
         ),*/
         body: MediaQuery(data: MediaQuery.of(context),child:Container(
-          
+          decoration: BoxDecoration(gradient: LinearGradient(colors: [Color.fromARGB(255, 89, 178, 219),Color.fromARGB(255, 71, 153, 190)])),
           child: Center(
             child: SizedBox(
               height: double.infinity,
@@ -378,11 +577,15 @@ onPressed: () {
         city = "Tokyo";
         country = "Japan";
         timezone = "Asia/Tokyo";
+        animationValueController = 0;
+        countryIndex = 0;
         fetchWeatherForLocation(35.6895, 139.6917);
       } else {
         city = "Athens";
         country = "Greece";
         timezone = "Europe/Athens";
+        animationValueController = 1;
+        countryIndex = 1;
         fetchWeatherForLocation(37.9838, 23.7278);
       }
     });
@@ -392,7 +595,7 @@ onPressed: () {
                                     '$country ,$city',
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 32),
-                                  ),
+                                  ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                 )
                               ]),
                             ),
@@ -407,7 +610,7 @@ onPressed: () {
                                   '${currentTemperatureNow}°C',
                                   style: const TextStyle(
                                       fontSize: 23, color: Colors.white),
-                                )
+                                ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                               ]),
                               Padding(
                                 padding:
@@ -424,7 +627,7 @@ onPressed: () {
                                     '${currentPrecipitationNow}%',
                                     style: const TextStyle(
                                         fontSize: 23, color: Colors.white),
-                                  )
+                                  ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                 ]),
                               ),
                               Column(children: [
@@ -440,7 +643,7 @@ onPressed: () {
                                   '${currentHumidityNow}%',
                                   style: const TextStyle(
                                       fontSize: 23, color: Colors.white),
-                                )
+                                ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                               ])
                             ]),
                             Visibility(
@@ -455,10 +658,15 @@ onPressed: () {
                                     color: returnColorWidget(),
                                     height: 80,
                                     width: 420,
-                                    child: ListView(
-                                        scrollDirection: Axis.horizontal,
-                                        children: [
-                                          Padding(
+                                    child: CustomScrollView(
+  scrollDirection: Axis.horizontal,
+  slivers: [
+    SliverPadding(
+      padding: EdgeInsets.only(left: 6),
+      sliver: SliverList(
+        delegate: SliverChildListDelegate(
+          [
+            Padding(
                                               padding:
                                                   const EdgeInsets.only(left: 6, top: 6),
                                               child: WidgetBuilder(0, formattedHour)),
@@ -512,7 +720,13 @@ onPressed: () {
                                               padding:
                                                   const EdgeInsets.only(left: 18, top: 6),
                                               child: WidgetBuilder(12, formattedHour))
-                                        ]))),
+            // Add more WidgetBuilder widgets here for other indices
+          ],
+        ),
+      ),
+    ),
+  ],
+))),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16.0),
                               child: Divider(
@@ -690,11 +904,11 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('$currentTemperatureNow°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(0),
                                           title: Text('$today',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -720,7 +934,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -743,7 +957,7 @@ onPressed: () {
                                                               '${AVGCloud2[0].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -759,7 +973,7 @@ onPressed: () {
                                                       Text('$currentHumidityNow%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -928,11 +1142,11 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('${TempMatrix[1][0]}°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(1),
                                           title: Text('$tomorrow',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -958,7 +1172,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -981,7 +1195,7 @@ onPressed: () {
                                                               '${AVGPrec2[1].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -997,7 +1211,7 @@ onPressed: () {
                                                       Text('${HumiMatrix[1][0]}%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -1166,11 +1380,11 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('${TempMatrix[2][0]}°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(2),
                                           title: Text('${Dayplustwo.substring(0, 3)}',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -1196,7 +1410,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -1219,7 +1433,7 @@ onPressed: () {
                                                               '${AVGCloud2[2].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -1235,7 +1449,7 @@ onPressed: () {
                                                       Text('${HumiMatrix[2][0]}%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -1404,12 +1618,12 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('${TempMatrix[3][0]}°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(3),
                                           title: Text(
                                               '${Dayplusthree.substring(0, 3)}',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -1435,7 +1649,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -1458,7 +1672,7 @@ onPressed: () {
                                                               '${AVGCloud2[3].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -1474,7 +1688,7 @@ onPressed: () {
                                                       Text('${HumiMatrix[3][0]}%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -1643,12 +1857,12 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('${TempMatrix[4][0]}°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(4),
                                           title: Text(
                                               '${Dayplusfour.substring(0, 3)}',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -1674,7 +1888,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -1697,7 +1911,7 @@ onPressed: () {
                                                               '${AVGCloud2[4].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -1713,7 +1927,7 @@ onPressed: () {
                                                       Text('${HumiMatrix[4][0]}%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -1882,12 +2096,12 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('${TempMatrix[5][0]}°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(5),
                                           title: Text(
                                               '${Dayplusfive.substring(0, 3)}',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -1913,7 +2127,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -1936,7 +2150,7 @@ onPressed: () {
                                                               '${AVGCloud2[5].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -1952,7 +2166,7 @@ onPressed: () {
                                                       Text('${HumiMatrix[5][0]}%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -2121,11 +2335,11 @@ onPressed: () {
                                         child: ListTile(
                                           subtitle: Text('${TempMatrix[6][0]}°C',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           leading: returnStatusImage(6),
                                           title: Text('${Dayplussix.substring(0, 3)}',
                                               style: const TextStyle(
-                                                  color: Colors.white, fontSize: 16)),
+                                                  color: Colors.white, fontSize: 16)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                                           trailing: SingleChildScrollView(
                                             physics:
                                                 const NeverScrollableScrollPhysics(),
@@ -2151,7 +2365,7 @@ onPressed: () {
                                                         style: const TextStyle(
                                                             color: Colors.white,
                                                             fontSize: 12),
-                                                      )
+                                                      ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
               
                                                 // Add spacing between widgets
@@ -2174,7 +2388,7 @@ onPressed: () {
                                                               '${AVGCloud2[6].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
-                                                                  fontSize: 12))
+                                                                  fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                         ])),
                                                 Column(
                                                     mainAxisSize: MainAxisSize.min,
@@ -2190,7 +2404,7 @@ onPressed: () {
                                                       Text('${HumiMatrix[6][0]}%',
                                                           style: const TextStyle(
                                                               color: Colors.white,
-                                                              fontSize: 12))
+                                                              fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                                                     ]),
                                               ],
                                             ),
@@ -2267,7 +2481,7 @@ onPressed: () {
                             fontWeight: FontWeight.bold,
                             fontSize: 27,
                           ),
-                        ),
+                        ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                       ],
                     ),
                   ),
@@ -2299,7 +2513,7 @@ onPressed: () {
                             fontWeight: FontWeight.bold,
                             fontSize: 27,
                           ),
-                        ),
+                        ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
                       ],
                     ),
                   ),
@@ -2327,11 +2541,11 @@ onPressed: () {
                 title: Text(
                   '${DewMatrix[0][4]}',
                   style: const TextStyle(color: Colors.white),
-                ),
+                ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                 subtitle: const Text(
                   'Dewpoint',
                   style: TextStyle(color: Colors.white),
-                ),
+                ).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
                 leading: const Icon(
                   Icons.dew_point,
                   size: 50,
@@ -2363,7 +2577,7 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
     builder: (BuildContext context) {
       return AlertDialog(
         title: Text(title,style: const TextStyle(color: Colors.white,fontSize: 32)),
-        content: Text(description,style: const TextStyle(color: Colors.white,fontSize: 24)),
+        content: Text(description,style: const TextStyle(color: Colors.white,fontSize: 24)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1),
         actions: <Widget>[
           
           TextButton(
@@ -2874,4 +3088,22 @@ first = 'Monday';
         textCloud = '雲量';
         windText = '風速';*/
         }
-        }*/
+        }*/class PlaceholderWidget extends StatefulWidget {
+  @override
+  _PlaceholderWidgetState createState() => _PlaceholderWidgetState();
+}
+
+class _PlaceholderWidgetState extends State<PlaceholderWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.grey[300], // Placeholder color
+      child: Center(
+        child: Text(
+          'Tap to Replace', // Placeholder text
+          style: TextStyle(fontSize: 18.0),
+        ),
+      ),
+    );
+  }
+}
