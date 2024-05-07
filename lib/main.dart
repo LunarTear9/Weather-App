@@ -128,6 +128,8 @@ class MainHomeScreenState extends State<MainHomeScreen> {
   late List<double> dewPoint;
   late List<double> hourlyTemperature;
   late List<int> precipitationperhour;
+  late List<int> RawPrecipitationList = List<int>.filled(168, 0);
+  late List<int> RawCloudList = List<int>.filled(168, 0);
   late List<int> totalhumidity;
   int _selectedIndex = 0;
   bool loading = true;
@@ -142,6 +144,8 @@ class MainHomeScreenState extends State<MainHomeScreen> {
       List.generate(7, (index) => List<int>.filled(24, 0));
   List<List<int>> HumiMatrix =
       List.generate(7, (index) => List<int>.filled(24, 0));
+  
+  
   void initState() {
     super.initState();
     
@@ -177,7 +181,9 @@ class MainHomeScreenState extends State<MainHomeScreen> {
     for (int i = 0; i <= 6; i++) {
           for (int j = 0; j <= 23; j++) {
             CloudMatrix[i][j] = cloudList[tempflag];
-            HumiMatrix[i][j] = humidityList[tempflag];
+            RawCloudList[tempflag] = cloudList[tempflag];
+            RawPrecipitationList[tempflag] = precipitationList[tempflag];
+            HumiMatrix[i][j] = humidityList[tempflag];           
             TempMatrix[i][j] = temperatureList[tempflag];
             PrecMatrix[i][j] = precipitationList[tempflag];
             DewMatrix[i][j] = dewString[tempflag];
@@ -246,6 +252,8 @@ class MainHomeScreenState extends State<MainHomeScreen> {
     for (int i = 0; i <= 6; i++) {
           for (int j = 0; j <= 23; j++) {
             CloudMatrix[i][j] = cloudList[tempflag];
+            RawCloudList[tempflag] = cloudList[tempflag];
+            RawPrecipitationList[tempflag] = precipitationList[tempflag];
             HumiMatrix[i][j] = humidityList[tempflag];
             TempMatrix[i][j] = temperatureList[tempflag];
             PrecMatrix[i][j] = precipitationList[tempflag];
@@ -333,7 +341,8 @@ print('api call');
             currentwindspeed = windSpeed;
             currentHumidityNow = humidity;
             DewMatrix[i][j] = dewPoint[tempflag];
-            
+             RawCloudList[tempflag] = cloudTotal[tempflag];
+            RawPrecipitationList[tempflag] = precipitationList[tempflag];
             CloudMatrix[i][j] = cloudTotal[tempflag];
             PrecMatrix[i][j] = precipitationList[tempflag];
             TempMatrix[i][j] = temperatureList[tempflag];
@@ -343,6 +352,7 @@ print('api call');
           }
 
         }
+       
         if (countryIndex == 0){
 await prefs.setDouble('currentPrecipitationNow', currentPrecipitationNow);
 
@@ -670,7 +680,7 @@ onPressed: () {
             Padding(
                                               padding:
                                                   const EdgeInsets.only(left: 6, top: 6),
-                                              child: WidgetBuilder(0, formattedHour)),
+                                              child: WidgetBuilder2(0)),
                                           Padding(
                                               padding:
                                                   const EdgeInsets.only(left: 18, top: 6),
@@ -1199,7 +1209,7 @@ onPressed: () {
                                                                         'lib/assets/clouddisplay.png'))),
                                                           ),
                                                           Text(
-                                                              '${AVGPrec2[1].toInt()}%',
+                                                              '${AVGCloud2[1].toInt()}%',
                                                               style: const TextStyle(
                                                                   color: Colors.white,
                                                                   fontSize: 12)).animate()..fadeIn(duration: Duration(milliseconds: 1000 + animationValueController)).slideX(duration: Duration(milliseconds: 500,),begin: -0.1)
@@ -2620,7 +2630,8 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
 
 
   dynamic returnImageWidget() {
-    if (AVGCloud2[0] > 70) {
+    if (currentCloudNow > 60) {
+      
       return const AssetImage(
         'lib/assets/sky.jpg',
       );
@@ -2639,7 +2650,7 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
   }
 
   dynamic returnColorWidget() {
-    if (AVGCloud2[0] > 70) {
+    if (currentCloudNow > 60) {
       return colornight = const Color.fromARGB(129, 105, 105, 105);
     } else {
       return colorDay = const Color.fromARGB(133, 50, 127, 190);
@@ -2705,7 +2716,7 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
   }
 
   dynamic returnStatusMainImage(i) {
-    if (AVGPrec2[i] > 40) {
+    if (currentPrecipitationNow > 40) {
       return Container(
         height: 100,
         width: 200,
@@ -2713,7 +2724,7 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
             image: DecorationImage(
                 image: AssetImage('lib/assets/heavy-rain.png'), scale: 2)),
       );
-    } else if (AVGCloud2[i] > 60) {
+    } else if (currentCloudNow > 60) {
       return Container(
         height: 100,
         width: 200,
@@ -2733,7 +2744,7 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
   }
 
   dynamic returnStatusHourImage(i) {
-    if (PrecMatrix[0][i] > 40) {
+    if (RawPrecipitationList[i] > 40) {
       return Container(
         height: 40,
         width: 60,
@@ -2742,7 +2753,7 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
                 image: AssetImage('lib/assets/heavy-rain.png'),
                 fit: BoxFit.contain)),
       );
-    } else if (CloudMatrix[0][i] > 60) {
+    } else if (RawCloudList[i] > 60) {
       return Container(
         height: 40,
         width: 60,
@@ -2763,15 +2774,83 @@ void showCustomDialog(BuildContext context, String title, String description, Vo
     }
   }
 
+
+
+  dynamic WidgetBuilder2(i){
+DateTime now = DateTime.now();
+if (countryIndex == 0 ){
+    hourValue = 6;
+   }
+   else if(countryIndex == 1){
+
+    hourValue = 0;
+   }
+dynamic Widget2;
+    // Add one hour to the current time
+    DateTime oneHourLater = now.add(Duration(hours: i + hourValue));
+    int hour = oneHourLater.hour;
+ String currentHour = DateFormat('HH').format(now);
+    print(hour);
+    String oneHourLaterFormatted = DateFormat('HH').format(oneHourLater);
+
+    if (currentCloudNow > 60){
+      Widget2 = Container(
+        height: 40,
+        width: 60,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('lib/assets/clouddisplay.png'),
+                fit: BoxFit.contain)));
+    }
+    else if (currentPrecipitationNow > 40){
+
+      Widget2 = Container(
+        height: 40,
+        width: 60,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('lib/assets/heavyrain2.png'),
+                fit: BoxFit.contain)));
+    }
+    else {
+Widget2 = Container(
+        height: 40,
+        width: 60,
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage('lib/assets/sun (2).png'),
+                fit: BoxFit.contain)));
+
+    }
+    return Column(children: [
+      Widget2,
+      Text(
+        '${oneHourLaterFormatted}:00',
+        style: const TextStyle(fontSize: 18, color: Colors.white),
+      )
+    ]);
+    
+  }
+int hourValue = 0;
   dynamic WidgetBuilder(i, y) {
-    dynamic Widget = returnStatusHourImage(i);
+    
     DateTime now = DateTime.now();
+   if (countryIndex == 0 ){
+    hourValue = 6;
+   }
+   else if(countryIndex == 1){
+
+    hourValue = 0;
+   }
 
     // Add one hour to the current time
-    DateTime oneHourLater = now.add(Duration(hours: i + 6));
-
+    DateTime oneHourLater = now.add(Duration(hours: i + hourValue));
+    int hour = oneHourLater.hour;
+    dynamic Widget = returnStatusHourImage(hour);
     // Format the DateTime to display only the hour
+    
     String currentHour = DateFormat('HH').format(now);
+    print(hour);
     String oneHourLaterFormatted = DateFormat('HH').format(oneHourLater);
     return Column(children: [
       Widget,
